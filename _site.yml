@@ -1,1 +1,18 @@
-
+---
+name: "first-website"
+output_dir: "."
+output:
+  html_document:
+    theme: flatly
+navbar:
+  title: "Geography 176A Summer 2020"
+  left:
+    - text: "Home"
+      icon: fa-home
+      href: index.html
+    - text: "GIS Work"
+      href: geog176A.html
+  right: 
+    - icon: fa-github
+      href: https://github.com/hopewilcox/hopewilcox.github.io
+---

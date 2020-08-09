@@ -1,1 +1,17 @@
 
+---
+title: "About Me"
+---
+  
+<center>
+# Hi, I'm Hope Wilcox.
+</center>
+<center>
+![](hopegrad.jpg){width=40%} 
+</center>
+
+I am a recent graduate of the University of California, Santa Barbara with a degree in physical geography. Through my undergraduate studies, I have developed an interest in environmental and physical sciences, specifically in water resources and drought. I have written papers on water resources and the impact of drought on vegetation in the southern California region. 
+
+As a full time student and part-time worker, time management and organization has been key during my time at UCSB. Outside of my pursuit of a degree, I found a passion in volunteering at my local Humane Society. Working with the animals and ensuring they have quality human interaction while they wait for adoption has kept me grounded and seen the importance of community service.
+
+Based in Santa Barbara county, I plan on searching for employment in the area to put my knowledge to good use and further my education in a professional setting. 
