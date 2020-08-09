@@ -4,7 +4,7 @@ title: "Projects"
 
 In the summer of 2020 I took a class GIS course based in R. I wrote some code, and did some cool data science. Here is a collection of links! 
 
-## [Building a project website](hopewilcox.github.io/index.html)
+## [Building a project website](https://github.com/hopewilcox/hopewilcox.github.io)
 
 - In this assignment we learned the basic requirements to build an R Markdown website.
 - Created a GitHub repository to display the course projects.

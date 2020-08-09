@@ -1,0 +1,11 @@
+---
+title: "Hope Wilcox"
+author: "Hope Wilcox"
+date: "8/9/2020"
+output: html_document
+---
+## Education 
+- University of California, Santa Barbara, CA USA
+  -B.S., Physical Geography, 2020
+  
+# Skills  

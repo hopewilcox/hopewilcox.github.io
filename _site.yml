@@ -12,6 +12,8 @@ navbar:
       href: index.html
     - text: "GIS Work"
       href: geog176A.html
+    - text: "CV"
+      href: cv.html
   right: 
     - icon: fa-github
       href: https://github.com/hopewilcox/hopewilcox.github.io
