@@ -1,11 +1,25 @@
 ---
 title: "Hope Wilcox"
-author: "Hope Wilcox"
-date: "8/9/2020"
-output: html_document
+
 ---
-## Education 
+
+
+### Education 
 - University of California, Santa Barbara, CA USA
-  -B.S., Physical Geography, 2020
+  - B.S., Physical Geography, 2020
   
-# Skills  
+### Experience
+- Hostess, Firestone Walker Co., 2019-2020
+- Land Surveying Oak Creek, 2019
+
+### Skills
+#### Models
+  - DART 
+  
+#### Programming
+  - R, Python
+  
+#### Utilities
+  - ENVI
+  - QGIS
+  - ArcGIS
