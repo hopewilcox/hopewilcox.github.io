@@ -13,8 +13,7 @@ title: "Hope Wilcox"
 - Land Surveying Oak Creek, 2019
 
 ### Skills
-#### Models
-  - DART 
+ 
   
 #### Programming
   - R, Python
