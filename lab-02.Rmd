@@ -1,0 +1,112 @@
+---
+title: "Geography 176A"
+author: "[Hope Wilcox](https://hopewilcox.github.io)"
+subtitle: 'Lab 03: COVID-19 Pandemic'
+output:
+  html_document:
+    theme: flatly
+---
+# Question 1
+```{r}
+library(tidyverse)
+library(knitr)
+library(readxl)
+library(zoo)
+
+
+# read in covid data from URL
+covid19 = read_csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv')
+
+
+```
+Filter data to California and add new column of daily new cases
+
+```{r}
+covid_ca = covid19 %>%
+  filter(state=="California") %>%
+  group_by(county) %>%
+  mutate(newcases = cases - lag(cases)) %>%
+  ungroup()
+```
+
+Table of 5 counties with most cases
+```{r}
+
+top5cumulative= covid_ca %>%
+  filter(date==max(date)) %>%
+  slice_max(cases, n=5) %>%
+  select(county, cases)
+
+knitr::kable(top5cumulative,
+             caption = "Most Cumulative Cases California Counties",
+             col.names = c("County", "Cumulative Cases"))
+```
+Table of 5 counties with most new cases
+```{r}
+
+top5_newcases = covid_ca %>%
+  filter(date==max(date)) %>%
+  slice_max(newcases, n=5) %>%
+  select(county, newcases)
+
+knitr::kable(top5_newcases,
+             caption = "Most New Cases California Counties",
+             col.names = c("County", "New Cases"))
+```
+
+Read in population data and join with covid data.
+```{r}
+
+pop_est = read_excel("C:/Users/hopew/Desktop/github176/geog-176A-labs/data/PopulationEstimates.xls",
+                     skip=2)
+pop_est = pop_est %>%
+  select(fips="FIPStxt", state="State", "Area_Name", pop2019="POP_ESTIMATE_2019")
+
+pop_joined_covid = inner_join(pop_est, covid_ca, by="fips")
+
+cases_percapita = pop_joined_covid %>%
+  filter(date==max(date)-13) %>%
+  mutate(most_percapita = (sum(cases))/pop2019) %>%
+  mutate(new_percapita = ((sum(cases-lag(cases)))/pop2019))
+
+```
+
+Table of most cases per capita
+
+```{r}
+most_cumulative_percapita = cases_percapita %>%
+  slice_max(most_percapita, n=5) %>%
+  select(county, most_percapita)
+
+knitr::kable(most_cumulative_percapita,
+             caption = "Most Cumulative Cases Per Capita California Counties",
+             col.names = c("County", "Cumulative Cases per Capita"))
+
+
+```
+
+Table of most new cases per hundred thousand people
+```{r}
+last14days = pop_joined_covid %>%
+  filter(date>max(date)-14) %>%
+  group_by(county, pop2019) %>%
+  summarise(newcases=sum(newcases)) %>%
+  ungroup() %>%
+  mutate(case_per100k = newcases/(pop2019/100000)) %>%
+  filter(case_per100k<=100)
+knitr::kable(last14days,
+             caption="Counties with Most New Cases")
+```
+
+# Question 2
+
+![](C:/Users/hopew/Desktop/github176/geog-176A-labs/img/LA.png)
+![](C:/Users/hopew/Desktop/github176/geog-176A-labs/img/NY.png)
+![](C:/Users/hopew/Desktop/github176/geog-176A-labs/img/CA.png)
+![](C:/Users/hopew/Desktop/github176/geog-176A-labs/img/FL.png)
+
+
+
+
+
+
