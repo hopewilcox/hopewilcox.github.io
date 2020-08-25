@@ -1,0 +1,238 @@
+---
+title: "Geography 176A"
+author: "[Hope Wilcox](https://hopewilcox.github.io)"
+subtitle: 'Lab 03: Distances and the Border Zone'
+output: 
+  html_document:
+    theme: flatly
+---
+# Libraries
+```{r, results='hide'}
+# SPDS
+library(tidyverse)
+library(sf)
+library(units)
+library(dplyr)
+
+# Data
+library(USAboundaries)
+library(rnaturalearth)
+
+# Visualization
+library(gghighlight)
+library(ggrepel)
+library(knitr)
+library(ggthemes)
+```
+# Question 1:
+
+## 1.1 Define a Projection
+```{r, eval=FALSE}
+eqdc = '+proj=eqdc +lat_0=40 +lon_0=-96 +lat_1=20 +lat_2=60 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs'
+```
+
+### 
+
+## 1.2 Get USA state boundaries
+
+
+Access state boundaries
+```{r, eval=FALSE}
+USAboundaries::us_states(resolution = "low")
+```
+Filter data to only continental USA
+```{r}
+conus = USAboundaries::us_states() %>%
+  filter(!state_name %in% c("Puerto Rico",
+                            "Alaska",
+                            "Hawaii"))
+```
+
+
+## 1.3 Get country boundaries for Mexico, the USA, and Canada
+```{r, eval=FALSE}
+remotes::install_github("ropenscilabs/rnaturalearthdata")
+```
+
+World boundaries
+```{r, eval=FALSE}
+rnaturalearth::countries110
+```
+Make sure data is in simple features format.
+```{r}
+countries_sf = st_as_sf(countries110, coords = c("lng","lat"), crs = 4326)
+```
+Filter to Mexico, USA, Canada
+```{r}
+mex_can_us = countries_sf %>% 
+  filter(admin %in% c("Canada", "United States of America", "Mexico"))
+  
+```
+
+## 1.4 Get city locations from the CSV file
+```{r, results='hide'}
+cities = cities <- read_csv("../data/uscities.csv") %>% 
+  st_as_sf(coords=c("lng","lat"), crs=4326) %>% 
+   filter(!state_name %in% c("Puerto Rico",
+                            "Alaska",
+                            "Hawaii"))
+```
+# Question 2:
+## 2.1 Distance to USA Border (coastline or national) (km)
+```{r}
+
+conus_resolved = st_union(conus) %>%
+  st_cast("MULTILINESTRING")
+
+
+cities = cities %>% 
+  mutate(distance_to_us_border = st_distance(cities, conus_resolved),
+         distance_to_us_border = units::set_units(distance_to_us_border, "km"),
+         distance_to_us_border = units::drop_units(distance_to_us_border))
+
+farthest5_from_border = cities %>% 
+  slice_max(distance_to_us_border, n=5) %>% 
+  select(city, state_name, distance_to_us_border) %>% 
+  st_drop_geometry()
+
+knitr::kable(farthest5_from_border,
+             caption = "5 US Cities Farthest from Border",
+             col.names = c("City", "State", "Distance to Border"))
+
+```
+
+## 2.2 Distance to States (km)
+```{r}
+
+conus_preserved = st_combine(conus) %>%
+  st_cast("MULTILINESTRING")
+
+#cities = cities %>% 
+  #mutate(distance_to_states = st_distance(cities, conus_preserved),
+   #      distance_to_states = units::set_units(distance_to_states, "km"),
+    #     distance_to_states = units::drop_units(distance_to_states))
+
+
+
+#farthest_from_state = cities %>% 
+ # slice_max(distance_to_states, n=5) %>% 
+  #select(city, state_name, distance_to_states) %>% 
+  #st_drop_geometry()
+
+#knitr::kable(farthest_from_state,
+ #            caption = "5 US Cities Farthest from State Border",
+  #           col.names = c("City", "State", "Distance to state border"))
+```
+
+## Distance to Mexico (km)
+```{r}
+mexico = countries_sf %>% 
+  filter(admin %in% c("Mexico")) 
+  
+
+
+cities = cities %>% 
+  mutate(distance_to_mexico = st_distance(cities, mexico),
+         distance_to_mexico = units::set_units(distance_to_mexico, "km"),
+         distance_to_mexico = units::drop_units(distance_to_mexico))
+
+
+farthest_from_mexico = cities %>% 
+  slice_max(distance_to_mexico, n=5) %>% 
+  select(city, state_name, distance_to_mexico) %>% 
+  st_drop_geometry()
+
+knitr::kable(farthest_from_mexico,
+             caption = "5 US Cities Farthest from Mexico",
+             col.names = c("City", "State", "Distance to Mexico"))
+```
+
+
+## Distance to Canada (km)
+```{r}
+canada = countries_sf %>% 
+  filter(admin %in% c("Canada"))
+
+
+cities = cities %>% 
+  mutate(distance_to_canada = st_distance(cities, canada),
+         distance_to_canada = units::set_units(distance_to_canada, "km"),
+         distance_to_canada = units::drop_units(distance_to_canada))
+
+farthest_from_canada = cities %>% 
+  slice_max(distance_to_canada, n=5) %>% 
+  select(city, state_name, distance_to_canada) %>% 
+  st_drop_geometry()
+
+knitr::kable(farthest_from_canada,
+             caption = "5 US Cities Farthest from Canada",
+             col.names = c("City", "State", "Distance to Canada"))
+
+```
+
+# Question 3
+
+## 3.1 Data
+```{r}
+largest10_cities =cities %>% 
+            slice_max(population, n=10)
+
+ggplot()+
+  geom_sf(data = mex_can_us, color = "black") +
+  geom_sf(data = conus, color = "black") +
+  geom_sf(data = largest10_cities, color = "red") 
+
+```
+
+## 3.2 City Distance from the Border
+```{r}
+
+```
+
+## 3.3 City Distance from Nearest State
+```{r}
+#ggplot()+
+ # geom_sf(data = farthest5_from_border, color = "green")+
+  #geom_sf(data = distance_to_states)+
+  #geom_sf(data = distance_to_states, aes(col = as.numeric(dist)), size=.1)+
+  #ggrepel::geom_label_repel(data = farthest5_from_border,
+   #                         aes(label = city, geometry=geometry),
+    #                        stat = "sf_coordinates",
+     #                       size = 2)
+```
+
+
+
+# Question 4 Real World Application
+## 4.1 Quantifing Border Zone
+```{r}
+mex_cities_160km = cities %>% 
+  filter(distance_to_mexico<160)
+
+can_cities_160km = cities %>% 
+  filter(distance_to_canada<160)
+
+cities = cities %>% 
+  mutate(mex_cities_160km = distance_to_mexico<160) %>% 
+  mutate(can_cities_160km = distance_to_canada<160)
+
+
+```
+
+
+## 4.2 Mapping Border Zone
+```{r}
+ggplot()+
+  geom_sf(data = mex_can_us, color = "black")+
+  geom_sf(data = mex_cities_160km, color = "red")+
+  geom_sf(data = can_cities_160km, color = "blue")
+  
+```
+
+
+
+
+
+
+
+
