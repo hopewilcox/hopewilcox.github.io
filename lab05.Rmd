@@ -1,0 +1,223 @@
+---
+title: "Geography 176A - Lab 05"
+author: "Hope Wilcox"
+date: "9/4/2020"
+output:
+  html_document:
+    theme: flatly
+---
+
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(sf)
+library(raster)
+library(stats)
+
+library(getlandsat)
+library(mapview)
+library(osmdata)
+
+```
+
+
+### Question 1
+```{r, warning=FALSE, message=FALSE}
+
+# Part 1
+bb = read_csv('../data/uscities.csv') %>%
+  filter(city == "Palo") %>%
+  st_as_sf(coords = c("lng", "lat"), crs = 4326) %>%
+  st_transform(5070) %>%
+  st_buffer(5000) %>%
+  st_bbox() %>%
+  st_as_sfc() %>%
+  st_as_sf()
+
+
+
+
+#mapview(bb)
+
+```
+## Question 2
+#### Step 2
+```{r, warning=FALSE, message=FALSE}
+meta = read_csv("../data/palo-flood.csv")
+
+meta$download_url
+
+files = lsat_scene_files(meta$download_url) %>%
+  filter(grepl(paste0("B", 1:6, ".TIF$", collapse = "|"), file)) %>%
+  arrange(file) %>%
+  pull(file)
+```
+
+#### Step 3
+```{r, warning=FALSE, message=FALSE}
+lsat_image(files[1])
+
+st = sapply(files, lsat_image)
+
+
+s = stack(st) %>% setNames(c(paste0("band", 1:6)))
+```
+The dimensions are 7811 cells by 7681 cells by 6 layers. The crs is UTM zone 15. The cell resolution is 30 meters.
+
+
+
+#### step 4
+```{r, warning=FALSE, message=FALSE}
+
+bbwgs = bb %>% st_transform(4326)
+bb = st_bbox(bbwgs)
+
+cropper = bbwgs %>% st_transform(crs(s))
+
+r = crop(s, cropper)
+```
+The dimensions are 340 cells by 346 cells by 6 layers. The crs is UTM zone 15. The cell resolution is 30 meters.
+
+## Question 3
+#### step 1
+```{r, warning=FALSE, message=FALSE}
+par(mfrow = c(1,4))
+plotRGB(r, r=4, g=3, b=2)
+plotRGB(r, r=5, g=4, b=3)
+plotRGB(r, r=5, g=6, b=4)
+plotRGB(r, r=6, g=3, b=2)
+```
+Applying a color stretch increases the contrast of the image.  
+
+#### step 2 
+```{r, warning=FALSE, message=FALSE}
+par(mfrow = c(1,4))
+plotRGB(r, r=4, g=3, b=2, stretch = "lin")
+plotRGB(r, r=5, g=4, b=3, stretch = "lin")
+plotRGB(r, r=5, g=6, b=4, stretch = "lin")
+plotRGB(r, r=6, g=3, b=2, stretch = "lin")
+```
+
+## Question 4 
+
+#### step 1
+
+```{r, warning=FALSE, message=FALSE}
+ndvi = (r$band5 - r$band4)/(r$band5 + r$band4)
+
+ndwi = (r$band3 - r$band5)/(r$band3 + r$band5)
+
+mndwi = (r$band3 - r$band6)/(r$band3 + r$band6)
+
+wri = (r$band3 + r$band4)/(r$band5 + r$band6)
+
+swi = (1)/sqrt(r$band2 - r$band6)
+swi = na.omit(swi)
+indices_stack = stack(ndvi, ndwi, mndwi, wri, swi) %>% 
+  setNames(c("NDVI", "NDWI", "MNDWI", "WRI", "SWI"))
+
+
+palette = colorRampPalette(c("blue", "white", "red"))
+
+plot(indices_stack, col = palette(256))
+```
+
+Ndvi shows the vegetated areas in red and the areas with a higher water content in blue. The ndwi shows the water in red, the vegetated areas in blue, and what looks like more urban areas in white. Mndwi shows the water in red, and everything else in the image is in blue. Wri looks similar to the mndwi, but the flood plane is not white between the meanders of the river. The Swi shows the flood in blue, and the rest of the image is white. 
+
+
+
+
+
+#### step 2
+```{r, warning=FALSE, message=FALSE}
+thresholding = function(x){ifelse(x<=0, 1, NA)}
+
+flood = calc(ndvi, thresholding) 
+flood = na.omit(flood)
+plot(flood, col = "blue")
+
+
+```
+
+## Question 5
+
+#### step 1
+```{r, warning=FALSE, message=FALSE}
+set.seed(123)
+
+```
+
+#### step 2
+```{r, warning=FALSE, message=FALSE}
+r_values = getValues(r) %>% 
+  na.omit(r_values)
+dim(r)
+r = na.omit(r)
+
+k12 = kmeans(r_values, centers = 12)
+
+k6 = kmeans(r_values, centers = 6)
+
+k4 = kmeans(r_values, centers = 4)
+
+str(k12)
+```
+```{r, warning=FALSE, message=FALSE}
+kmeans_raster = indices_stack$NDVI
+kmeans_raster6 = indices_stack$NDVI
+kmeans_raster4 = indices_stack$NDVI
+
+values(kmeans_raster) = k12$cluster
+values(kmeans_raster6) = k6$cluster
+values(kmeans_raster4) = k4$cluster
+
+plot(kmeans_raster)
+plot(kmeans_raster6)
+plot(kmeans_raster4)
+```
+As the number of clusters decreases, the definition of the image also decreases.
+
+```{r, warning=FALSE, message=FALSE}
+flood_values = values(flood)
+k12_values = values(kmeans_raster)
+kmeans_table = table(flood_values, k12_values)
+
+idx = which.max(kmeans_table)
+
+kmeans_raster[kmeans_raster != idx] = 0
+kmeans_raster[kmeans_raster != 0] = 1
+
+
+plot(kmeans_raster)
+```
+```{r, warning=FALSE, message=FALSE}
+kmeans_mask = calc(kmeans_raster, thresholding)
+
+plot(kmeans_mask, col = "black")
+```
+
+
+```{r, warning=FALSE, message=FALSE}
+flood = addLayer(flood, kmeans_mask)
+
+plot(flood)
+
+```
+
+
+## Question 6
+
+```{r, warning=FALSE, message=FALSE}
+rsum = sum(flood)
+
+raster_stats = cellStats(flood, stat = sum)*res(flood)^2/1e6
+```
+There are 6667 flood cells with an area of 7.05875 e11. 
+
+```{r}
+knitr::kable(raster_stats, col.names = c("Area Covered"), caption = "Area Covered by flood") 
+  
+```
+
+
+
+
