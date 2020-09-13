@@ -2,7 +2,9 @@
 title: "Lab 06"
 author: "Hope Wilcox"
 date: "9/12/2020"
-output: html_document
+output: 
+  html_document:
+    theme: flatly
 ---
 
 ```{r, message=F, warning=F}
