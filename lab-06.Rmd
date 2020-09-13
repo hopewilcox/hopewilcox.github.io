@@ -1,0 +1,72 @@
+---
+title: "Lab 06"
+author: "Hope Wilcox"
+date: "9/12/2020"
+output: html_document
+---
+
+```{r, message=F, warning=F}
+library(sf)
+library(raster)
+library(fasterize)
+library(whitebox)
+library(osmdata)
+library(readr)
+library(elevatr)
+library(mapview)
+library(dplyr)
+```
+
+
+
+# Collecting Data
+
+## Basin boundary
+```{r, message=F, warning=F}
+basin_boundary = read_sf("https://labs.waterdata.usgs.gov/api/nldi/linked-data/nwissite/USGS-11119750/basin")
+```
+
+## Elevation Data
+```{r, warning=F, message=F}
+basin_elev = elevatr::get_elev_raster(basin_boundary, z = 13) %>%
+  crop(basin_boundary) %>% 
+  mask(basin_boundary) 
+
+basin_feet = basin_elev *3.281
+
+writeRaster(basin_feet, filename = "C:/Users/hopew/Desktop/github176/geog-176A-labs/data/basin_elevation_ft.tif", overwrite = T)
+
+```
+
+
+## Buildings and river-network data
+```{r, warning=F, message=F}
+building = osmdata::add_osm_feature(opq(basin_boundary), "building") %>% 
+  osmdata_sf()
+
+stream = osmdata::add_osm_feature(opq(basin_boundary), "waterway", "stream") %>% osmdata_sf()
+
+```
+
+```{r, warning=F, message=F}
+building = st_intersection(building$osm_polygons, basin_boundary)
+
+river = st_intersection(stream$osm_lines, basin_boundary)
+```
+
+# Terrain Analysis
+## Hillshade
+```{r, warning=F, message=F}
+wbt_hillshade("C:/Users/hopew/Desktop/github176/geog-176A-labs/data/basin_elevation_ft.tif", "C:/Users/hopew/Desktop/github176/geog-176A-labs/data/basin_hillshade.tif")
+
+basin_hillshade = raster("C:/Users/hopew/Desktop/github176/geog-176A-labs/data/basin_hillshade.tif")
+
+plot(basin_hillshade, col = gray.colors(256, alpha = .5), legend = F)
+plot(river$geometry, col = "blue", add = T)
+plot(basin_boundary$geometry, add = T)
+
+```
+
+# Height Above Nearest Drainage
+
+## Creating the river raster
