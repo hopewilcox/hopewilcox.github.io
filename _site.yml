@@ -1,7 +1,6 @@
 ---
 name: "first-website"
 output_dir: "."
-
 navbar:
   title: "Geography 176A Summer 2020"
   left:
