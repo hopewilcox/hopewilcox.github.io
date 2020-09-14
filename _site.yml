@@ -11,7 +11,6 @@ navbar:
       icon: fa-book
       href: geog176A.html
     - text: "CV"
-      icon: fa-home
       href: cv.html
 output:
   html_document:
