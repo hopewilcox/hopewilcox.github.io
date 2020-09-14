@@ -2,7 +2,7 @@
 name: "Hope Websites"
 output_dir: "."
 navbar:
-  title: "Welcome To Hope's Page"
+  title: "Geography 176A Summer 2020"
   left:
     - text: "Home"
       icon: fa-home
