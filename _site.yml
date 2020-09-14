@@ -1,4 +1,3 @@
----
 name: "first-website"
 output_dir: "."
 navbar:
@@ -17,4 +16,4 @@ navbar:
 output:
   html_document:
     theme: flatly
----
+
