@@ -10,12 +10,12 @@ In the summer of 2020 I took a class GIS course based in R. I wrote some code, a
 - Created a GitHub repository to display the course projects.
 - Add personalizations to the website in order to make it our own.
 
-### [Lab02 - COVID-19 Pandemic](https://hopewilcox.github.io/lab-02.html)
+## [Lab02 - COVID-19 Pandemic](https://hopewilcox.github.io/lab-02.html)
 
-### [Lab03 - Distances and Projections](https://hopewilcox.github.io/lab-03.html)
+## [Lab03 - Distances and Projections](https://hopewilcox.github.io/lab-03.html)
 
-### [Lab04 - Tesselations, Spatial Joins, and Point-in-Polygon](https://hopewilcox.github.io/lab-04.html)
+## [Lab04 - Tesselations, Spatial Joins, and Point-in-Polygon](https://hopewilcox.github.io/lab-04.html)
 
-### [Lab05 - Raster Analysis](https://hopewilcox.github.io/lab05.html)
+## [Lab05 - Raster Analysis](https://hopewilcox.github.io/lab05.html)
 
-### [Lab06 - Terrain Analysis](https://hopewilcox.github.io/lab-06.html)
+## [Lab06 - Terrain Analysis](https://hopewilcox.github.io/lab-06.html)
