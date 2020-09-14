@@ -1,19 +1,19 @@
-name: "first-website"
+
+name: "Hope Websites"
 output_dir: "."
 navbar:
-  title: "Geography 176A Summer RIP 2020"
+  title: "Welcome To Hope's Page"
   left:
     - text: "Home"
       icon: fa-home
       href: index.html
     - text: "GIS Work"
+      icon: fa-book
       href: geog176A.html
     - text: "CV"
+      icon: fa-home
       href: cv.html
-  right: 
-    - icon: fa-github
-      href: https://github.com/hopewilcox/hopewilcox.github.io
 output:
   html_document:
-    theme: flatly
-
+    theme: flatly 
+    highlight: textmate
