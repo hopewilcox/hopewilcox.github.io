@@ -1,25 +1,10 @@
----
-title: "Lab04"
-subtitle: "Tessellations, Spatial Joins, and Point-in-Polygon"
-author: "Hope Wilcox"
-date: "8/28/2020"
-output:
-   html_document:
-     theme: flatly
-
----
-```{r, warning=FALSE, message=F}
+library(units)
 library(tidyverse)
 library(sf)
-library(units)
-library(leaflet)
 library(readxl)
-library(ggplot2)
-```
 
 # 1.1
 
-```{r, warning=FALSE, message=FALSE}
 USAboundaries::us_states
 
 conus = USAboundaries::us_states() %>%
@@ -33,21 +18,13 @@ counties = USAboundaries::us_counties() %>%
                             "Alaska",
                             "Hawaii")) %>%
   st_transform(counties, crs = 5070)
-```
-
-
 
 
 # 1.2
-
-```{r, warning=FALSE}
 county_centroid = st_centroid(counties) %>%
   st_union()
-```
 
 # 1.3
-
-```{r}
 # voronoi tessellation
 vor_tess = st_voronoi(county_centroid) %>%
   st_cast() %>%
@@ -71,55 +48,46 @@ hex_counties = st_make_grid(county_centroid, n=70, square = F) %>%
   st_cast() %>%
   st_as_sf() %>%
   mutate(id=1:n())
-```
-
-
 
 # 1.4
-```{r, warning=FALSE}
 vor_tess = st_intersection(vor_tess, st_union(counties))
 tri_tess = st_intersection(tri_tess, st_union(counties))
 gridded_counties = st_intersection(gridded_counties, st_union(counties))
 hex_counties = st_intersection(hex_counties, st_union(counties))
-```
 
 
 # 1.5
-```{r, warning=FALSE}
-counties_simp = rmapshaper::ms_simplify(counties, keep = .005)
-
+counties_simp = rmapshaper::ms_simplify(counties, keep = .01)
+plot(counties_simp$geometry)
 mapview::npts(counties)
 mapview::npts(counties_simp)
-```
-Just over 50% of the points were removed. This makes the edge of the border less accurate, but makes the computations faster.
+
+tri_tess = st_intersection(tri_tess, counties_simp)
+
+vor_tess = st_intersection(vor_tess, counties_simp)
 
 
 # 1.6
-```{r, warning=FALSE}
 plot_tess = function(sf_obj, title){
   ggplot()+
     geom_sf(data = sf_obj, fill = "white", col = "navy", size = .2)+
     theme_void() +
     labs(title = title, caption = paste("This tessellation has:", nrow(sf_obj), "features." ))
   }
-```
-
-
 
 # 1.7
-```{r, warning=FALSE}
 plot_tess(vor_tess, "Voronoi Tessellation")
 plot_tess(tri_tess, "Triangulated Tessellation")
 plot_tess(gridded_counties, "Gridded Coverage")
 plot_tess(hex_counties, "Hexagonal Coverage")
-plot_tess(counties_simp, "Original")
-```
+
+
 
 
 
 # Question 2
-## 2.1
-```{r, warning=FALSE}
+# 2.1
+
 tess_sum = function(sf_obj, text){
 
   area = st_area(sf_obj) %>%
@@ -129,27 +97,20 @@ tess_sum = function(sf_obj, text){
 data.frame(num_features = nrow(sf_obj),
            mean_area = mean(area),
            sd_area = sd(area),
-           total_area = sum(area),
-           text = text
+           total_area = sum(area)
 )
 
 
 }
-```
 
-
-## 2.2
-```{r, warning=FALSE}
+# 2.2
 
 vor_sum_tess = tess_sum(vor_tess, "Voronoi")
 tri_sum_tess = tess_sum(tri_tess, "Triangulation")
 hex_sum = tess_sum(hex_counties, "Hexagon")
 grid_sum = tess_sum(gridded_counties, "Grid")
-```
-
 
 # 2.3
-```{r, warning=FALSE}
 
 summary_tess = bind_rows(
   tess_sum(counties_simp, "Original Counties"),
@@ -159,24 +120,13 @@ summary_tess = bind_rows(
   tess_sum(gridded_counties, "Grid")
 )
 
-```
-
 # 2.4
-```{r, warning=FALSE}
 knitr::kable(summary_tess,
-             caption = "Five Tessellation summaries",
-             col.names = c("Number of Features", "Mean Area", "Standard Deviation of Features", "Total Area", "Text"),
-             format.args = list(big.marks = ","))
+            col.names = c("Number of Features", "Mean Area", "Standard Deviation of Features", "Total Area"))
 
-```
-
-## 2.5
-For each of the tessellations, the area and number of polygons changed. This will cause the MAUP to change with the tessellations. The triangulation tessellation had the most number of polygons, and the hexagonal coverage had the about half the number of polygons. The total area was largest with the gridded coverage tessellation.
 
 # Question 3
-## 3.1
-```{r, warning=FALSE}
-
+# 3.1
 dams <- read_excel("NID2019_U.xlsx")
 
 dams_sf = dams %>%
@@ -184,11 +134,8 @@ dams_sf = dams %>%
   st_as_sf(coords = c("LONGITUDE","LATITUDE"), crs = 4326) %>%
   st_transform(5070)
 
-```
 
-
-## 3.2
-```{r, warning=FALSE}
+# 3.2
 
 pip_func = function(points, polygon, id){
   st_join(polygon, points) %>%
@@ -199,10 +146,6 @@ pip_func = function(points, polygon, id){
     st_as_sf()
 
 }
-
-#### second function for the original data because the id column is "geoid" and the function was only taking count(get("id)) with id in quotes ####
-
-
 pip_func_county_simp = function(points, polygon, id){
   st_join(polygon, points) %>%
     st_drop_geometry() %>%
@@ -213,22 +156,15 @@ pip_func_county_simp = function(points, polygon, id){
 
 }
 
-```
-
-## 3.3
-```{r, warning=FALSE}
-
+# 3.3
 vor_pip = pip_func(dams_sf, vor_tess, "id")
 tri_pip = pip_func(dams_sf, tri_tess, "id")
 gridded_pip = pip_func(dams_sf, gridded_counties, "id")
 hex_pip = pip_func(dams_sf, hex_counties, "id")
 counties_simp_pip = pip_func_county_simp(dams_sf, counties_simp, "geoid")
-```
 
 
-
-## 3.4
-```{r, warning=FALSE}
+# 3.4
 plot_pip = function(sf_obj, title){
   ggplot()+
     geom_sf(data = sf_obj, aes(fill = log(n)))+
@@ -236,11 +172,7 @@ plot_pip = function(sf_obj, title){
     theme_void() +
     labs(title = title, caption = paste("This tessellation has:", sum(sf_obj$n), "dams." ))
 }
-```
 
-
-## 3.5
-```{r, warning=FALSE}
 plot_pip(vor_pip, "Voronoi")
 plot_pip(tri_pip, "triangulation")
 plot_pip(gridded_pip, "gridded")
@@ -250,18 +182,8 @@ plot_pip(counties_simp_pip, "original")
 
 
 
-
-```
-
-## 3.6
-The more polygons each tessellation had, the higher the amount of dams there were in each section. Moving forward, we will be using the hexagonal coverage tessellation. 
-
-
-
-## 4.1
-```{r, warning=FALSE}
-
-dam_freq = strsplit(dams_sf$PURPOSES, split = "") %>%
+# 4.1
+dam_freq = strsplit(dams$PURPOSES, split = "") %>%
      unlist() %>%
      table() %>%
      as.data.frame() %>%
@@ -269,59 +191,11 @@ dam_freq = strsplit(dams_sf$PURPOSES, split = "") %>%
 
 
 
-r_grep = grepl("R", dams_sf$PURPOSES[1:20])
-s_grep = grepl("S", dams_sf$PURPOSES[1:20])
-h_grep = grepl("H", dams_sf$PURPOSES[1:20])
-d_grep = grepl("D", dams_sf$PURPOSES[1:20])
 
 
 
-```
-
-## 4.2
-
-```{r, warning=FALSE}
-plot_pip = function(sf_obj, title){
-  ggplot()+
-    geom_sf(data = sf_obj, aes(fill = log(n)))+
-    scale_fill_viridis_c()+
-    theme_void() +
-    labs(title = title, caption = paste("This tessellation has:", sum(sf_obj$n), "dams." ))+
-    gghighlight::gghighlight(n>=(mean(n)+sd(n)))
-}
 
 
-rec = dams_sf %>% 
-  filter(grepl("R", PURPOSES)) %>% 
-  pip_func(vor_tess, "id") %>% 
-  plot_pip(vor_tess)+
-  gghighlight::gghighlight(n >= (mean(n)+sd(n)))
-
-
-s = dams_sf %>% 
-  filter(grepl("S", PURPOSES)) %>% 
-  pip_func(vor_tess, "id") %>% 
-  plot_pip(vor_tess)+
-  gghighlight::gghighlight(n >= (mean(n)+sd(n)))
-
-
-h = dams_sf %>% 
-  filter(grepl("H", PURPOSES)) %>% 
-  pip_func(vor_tess, "id") %>% 
-  plot_pip(vor_tess)+
-  gghighlight::gghighlight(n >= (mean(n)+sd(n)))
-
-
-d = dams_sf %>% 
-  filter(grepl("D", PURPOSES)) %>% 
-  pip_func(vor_tess, "id") %>% 
-  plot_pip(vor_tess)+
-  gghighlight::gghighlight(n >= (mean(n)+sd(n)))
-
-rec
-s
-h
-d
-
-
-```
+plot(dam_freq$count[3:8])
+ggplot(dam_freq, aes(x=abbr))+
+  geom_bar(data = dam_freq)

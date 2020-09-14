@@ -7,7 +7,7 @@ output:
     theme: flatly
 ---
 # Question 1
-```{r, message=F, warning=F}
+```{r, warning=F, message=F}
 library(tidyverse)
 library(knitr)
 library(readxl)
@@ -21,7 +21,7 @@ covid19 = read_csv('https://raw.githubusercontent.com/nytimes/covid-19-data/mast
 ```
 Filter data to California and add new column of daily new cases
 
-```{r, message=F, warning=F}
+```{r, warning=F, message=F}
 covid_ca = covid19 %>%
   filter(state=="California") %>%
   group_by(county) %>%
@@ -30,7 +30,7 @@ covid_ca = covid19 %>%
 ```
 
 Table of 5 counties with most cases
-```{r, message=F, warning=F}
+```{r, warning=F, message=F}
 
 top5cumulative= covid_ca %>%
   filter(date==max(date)) %>%
@@ -42,7 +42,7 @@ knitr::kable(top5cumulative,
              col.names = c("County", "Cumulative Cases"))
 ```
 Table of 5 counties with most new cases
-```{r, message=F, warning=F}
+```{r, warning=F, message=F}
 
 top5_newcases = covid_ca %>%
   filter(date==max(date)) %>%
@@ -55,7 +55,7 @@ knitr::kable(top5_newcases,
 ```
 
 Read in population data and join with covid data.
-```{r, message=F, warning=F}
+```{r, warning=F, message=F}
 
 pop_est = read_excel("C:/Users/hopew/Desktop/github176/geog-176A-labs/data/PopulationEstimates.xls",
                      skip=2)
@@ -73,7 +73,7 @@ cases_percapita = pop_joined_covid %>%
 
 Table of most cases per capita
 
-```{r, message=F, warning=F}
+```{r, warning=F, message=F}
 most_cumulative_percapita = cases_percapita %>%
   slice_max(most_percapita, n=5) %>%
   select(county, most_percapita)
@@ -86,7 +86,7 @@ knitr::kable(most_cumulative_percapita,
 ```
 
 Table of most new cases per hundred thousand people
-```{r, message=F, warning=F}
+```{r, warning=F, message=F}
 last14days = pop_joined_covid %>%
   filter(date>max(date)-14) %>%
   group_by(county, pop2019) %>%
