@@ -13,6 +13,7 @@ In the summer of 2020 I took a class GIS course based in R. I wrote some code, a
 ## [Lab02 - Data Wrangling](https://hopewilcox.github.io/lab-02.html)
 ![](lab02_pic.png){width=20%}
 
+
 - Loaded in raw data to filter, manipulate, and analyze.
 - Practice visualization skills via real-time pandemic data.
 - Present data in tables and figures.
@@ -38,7 +39,7 @@ In the summer of 2020 I took a class GIS course based in R. I wrote some code, a
 - Using the raster package, categorized flood images using the multiband imagery.
 
 ## [Lab06 - Terrain Analysis](https://hopewilcox.github.io/lab-06.html)
-![](lab06_pic.png){width=20%}
+![](mission_creek.gif){width=20%}
 
 - Analyzed a flood event in Santa Barbara, California.
 - Mapped the boundary of the river basin, the river, and the buildings (including railways) inside the basin.
