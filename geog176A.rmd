@@ -11,7 +11,7 @@ In the summer of 2020 I took a class GIS course based in R. I wrote some code, a
 - Add personalizations to the website in order to make it our own.
 
 ## [Lab02 - Data Wrangling](https://hopewilcox.github.io/lab-02.html)
--Loaded in raw data to filter, manipulate, and analyze.
+- Loaded in raw data to filter, manipulate, and analyze.
 - Practice visualization skills via real-time pandemic data.
 - Present data in tables and figures.
 
