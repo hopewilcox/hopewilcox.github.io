@@ -1,5 +1,6 @@
 ---
-title: "Geography 176A - Lab 05"
+title: "Lab 05"
+subtitle: "Raster Analysis"
 author: "Hope Wilcox"
 date: "9/4/2020"
 output:

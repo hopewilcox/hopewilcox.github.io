@@ -1,5 +1,6 @@
 ---
-title: "Lab"
+title: "Lab04"
+subtitle: "Tessellations, Spatial Joins, and Point-in-Polygon"
 author: "Hope Wilcox"
 date: "8/28/2020"
 output:
@@ -7,7 +8,7 @@ output:
      theme: flatly
 
 ---
-```{r, warning=FALSE}
+```{r, warning=FALSE, message=F}
 library(tidyverse)
 library(sf)
 library(units)
@@ -18,7 +19,7 @@ library(ggplot2)
 
 # 1.1
 
-```{r, warning=FALSE}
+```{r, warning=FALSE, message=FALSE}
 USAboundaries::us_states
 
 conus = USAboundaries::us_states() %>%
@@ -128,7 +129,8 @@ tess_sum = function(sf_obj, text){
 data.frame(num_features = nrow(sf_obj),
            mean_area = mean(area),
            sd_area = sd(area),
-           total_area = sum(area)
+           total_area = sum(area),
+           text = text
 )
 
 
@@ -162,9 +164,10 @@ summary_tess = bind_rows(
 # 2.4
 ```{r, warning=FALSE}
 knitr::kable(summary_tess,
-            col.names = c("Number of Features", "Mean Area", "Standard Deviation of Features", "Total Area"))
+             caption = "Five Tessellation summaries",
+             col.names = c("Number of Features", "Mean Area", "Standard Deviation of Features", "Total Area", "Text"),
+             format.args = list(big.marks = ","))
 
-### The order is voronoi, triangulation, gridded, hexagonal, original data###
 ```
 
 ## 2.5
@@ -266,10 +269,11 @@ dam_freq = strsplit(dams_sf$PURPOSES, split = "") %>%
 
 
 
-grepl("R", dams_sf$PURPOSES[1:20])
-grepl("S", dams_sf$PURPOSES[1:20])
-grepl("H", dams_sf$PURPOSES[1:20])
-grepl("D", dams_sf$PURPOSES[1:20])
+r_grep = grepl("R", dams_sf$PURPOSES[1:20])
+s_grep = grepl("S", dams_sf$PURPOSES[1:20])
+h_grep = grepl("H", dams_sf$PURPOSES[1:20])
+d_grep = grepl("D", dams_sf$PURPOSES[1:20])
+
 
 
 ```
@@ -283,6 +287,41 @@ plot_pip = function(sf_obj, title){
     scale_fill_viridis_c()+
     theme_void() +
     labs(title = title, caption = paste("This tessellation has:", sum(sf_obj$n), "dams." ))+
-    gghighlight::gghighlight(n>(mean(n)+sd(n)))
+    gghighlight::gghighlight(n>=(mean(n)+sd(n)))
 }
+
+
+rec = dams_sf %>% 
+  filter(grepl("R", PURPOSES)) %>% 
+  pip_func(vor_tess, "id") %>% 
+  plot_pip(vor_tess)+
+  gghighlight::gghighlight(n >= (mean(n)+sd(n)))
+
+
+s = dams_sf %>% 
+  filter(grepl("S", PURPOSES)) %>% 
+  pip_func(vor_tess, "id") %>% 
+  plot_pip(vor_tess)+
+  gghighlight::gghighlight(n >= (mean(n)+sd(n)))
+
+
+h = dams_sf %>% 
+  filter(grepl("H", PURPOSES)) %>% 
+  pip_func(vor_tess, "id") %>% 
+  plot_pip(vor_tess)+
+  gghighlight::gghighlight(n >= (mean(n)+sd(n)))
+
+
+d = dams_sf %>% 
+  filter(grepl("D", PURPOSES)) %>% 
+  pip_func(vor_tess, "id") %>% 
+  plot_pip(vor_tess)+
+  gghighlight::gghighlight(n >= (mean(n)+sd(n)))
+
+rec
+s
+h
+d
+
+
 ```

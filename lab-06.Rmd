@@ -1,6 +1,7 @@
 ---
 title: "Lab 06"
-author: "Hope Wilcox"
+author: "[Hope Wilcox](https://hopewilcox.github.io)"
+subtitle: "Terrain Analysis"
 date: "9/12/2020"
 output: 
   html_document:
@@ -17,6 +18,7 @@ library(readr)
 library(elevatr)
 library(mapview)
 library(dplyr)
+library(gifski)
 ```
 
 
@@ -51,7 +53,10 @@ stream = osmdata::add_osm_feature(opq(basin_boundary), "waterway", "stream") %>%
 ```
 
 ```{r, warning=F, message=F}
-building = st_intersection(building$osm_polygons, basin_boundary)
+building = st_centroid(building$osm_polygons) %>% 
+  st_intersection(basin_boundary)
+
+railway = dplyr::filter(building, amenity =="railway")
 
 river = st_intersection(stream$osm_lines, basin_boundary)
 ```
@@ -72,3 +77,124 @@ plot(basin_boundary$geometry, add = T)
 # Height Above Nearest Drainage
 
 ## Creating the river raster
+```{r, warning=F, message=F}
+river_raster = st_transform(river, 5070) %>% 
+  st_buffer(10) %>% 
+  st_transform(crs(basin_feet)) %>% 
+  fasterize::fasterize(basin_feet) %>% 
+  writeRaster("../data/river_raster.tif", overwrite = T)
+
+```
+
+
+## Creating the hydrologically corrected surface
+```{r, warning=F, message=F}
+wbt_breach_depressions("../data/basin_elevation_ft.tif",
+                       "../data/breach_depressions.tif")
+```
+## Creating the HAND raster
+```{r, warning=F, message=F}
+wbt_elevation_above_stream("../data/breach_depressions.tif", "../data/river_raster.tif", "../data/elev_above_stream.tif")
+```
+# Correcting to local reference datum
+```{r, warning=F, message=F}
+hand_raster = raster("../data/elev_above_stream.tif") +3.69
+
+river_raster = raster("../data/river_raster.tif")
+
+hand_raster[river_raster ==1] = 0
+
+writeRaster(hand_raster, "../data/corrected.tif", overwrite = T)
+
+
+
+```
+
+
+
+# 2017 Impact Assessment
+## Map the flood and estimate the impacts
+```{r, warning=F, message=F}
+flood17 = raster("../data/corrected.tif")
+flood17_map = flood17
+
+flood17_map[flood17_map >= 10.02] = NA
+
+cols = ifelse(!is.na(raster::extract(flood17_map, building)), "red", "black")
+
+
+plot(basin_hillshade, col = gray.colors(256, alpha = .5), legend = F, main = paste0(sum(cols == "red"), " impacted buildings, 10.02 foot stage."))
+
+plot(flood17_map, col = rev(blues9), legend = F, add = T)
+plot(building$geometry, add = T, col = cols, pch = 16, cex = .08)
+
+
+
+plot(railway$geometry, col = "green", cex = 1, pch = 16, add = T)
+
+plot(basin_boundary$geometry, add = T, border = "black")
+
+```
+
+#### Does the map look accurate?
+#### The map looks accurate.
+
+# Extra Credit
+## Flood Inundation Map library
+
+```{r, warning=F, message=F}
+sb = AOI::aoi_get("Santa Barbara")
+flood_gif = crop(flood17, sb)
+basin_clip = st_intersection(basin_boundary, sb)
+hill_crop = crop(basin_hillshade, sb)
+
+```
+
+## Making the GIF
+```{r, warning=F, message=F}
+gifski::save_gif({
+  for(i in 0:20){
+    tmp = flood_gif
+    tmp[tmp>= i] = NA
+    cols = ifelse(!is.na(raster::extract(tmp, building)), "red", "black")
+    plot(hill_crop, col = gray.colors(256, alpha = .5), legend = F,
+         main = paste0(sum(cols == "red"), " impacted buildings, ", i, " foot stage"))
+    plot(tmp, col = rev(blues9), legend = F, add = T)
+    plot(building$geometry, add = T, col = cols, pch = 16, cex = .08)
+    plot(railway$geometry, add = T, col = "green", cex = 1, pch = 16)
+    plot(basin_clip$geometry, add = T, border = "black")
+  }
+}, gif_file = "../data/mission_creek.gif",
+width = 600, height = 600,
+delay = .7, loop = T
+)
+
+```
+![](../data/mission_creek.gif)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
