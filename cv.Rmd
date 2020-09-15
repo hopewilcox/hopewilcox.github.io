@@ -8,13 +8,29 @@ title: "Hope Wilcox"
 - University of California, Santa Barbara, CA USA
   - B.S., Physical Geography, 2020
   
-### Experience
+### Work Experience
 - Hostess, Firestone Walker Co., 2019-2020
-- Land Surveying Oak Creek, 2019
+  - Greet and assist guests upon arrival
+  - Manage restaurant servers to ensure efficient work flow on the floor
+  - Organize and set up reservations
+  - Restock retail items and promote sales
+- Church Secretary, 2013-2016
+  - Type out the Sunday service program
+  - Keep books of mailing list
+  - Organize food bank
 
-### Skills
- 
+### Volunteer Experience
+- Land Surveying Oak Creek, 2019
+  - Assist a professor with surveying the creek, creating morphologic maps using bearings
+- Santa Maria Humane Society, 2017-2019
+  - Socialize with cats and dogs to encourage friendly behavior
+  - Walk dogs to practice leash training
+  - Assist in front office, greet visitors, and show visitors to adoptable animals
+- Boys and Girls Club Mentor
+  - Help children with their homework after school
+  - Assist in sports games and other extracurricular events
   
+### Skills
 #### Programming
   - R, Python
   
