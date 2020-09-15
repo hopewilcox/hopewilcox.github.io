@@ -11,30 +11,35 @@ In the summer of 2020 I took a class GIS course based in R. I wrote some code, a
 - Add personalizations to the website in order to make it our own.
 
 ## [Lab02 - Data Wrangling](https://hopewilcox.github.io/lab-02.html)
-![](lab02_pic.png)
+![](lab02_pic.png){width=20%}
+
 - Loaded in raw data to filter, manipulate, and analyze.
 - Practice visualization skills via real-time pandemic data.
 - Present data in tables and figures.
 
 ## [Lab03 - Distances and Projections](https://hopewilcox.github.io/lab-03.html)
-![](lab03_pic.png)
+![](lab03_pic.png){width=20%}
+
 - Created sf objects of the US from CSV files.
 - Calculated distances from US cities to the national, state, Mexican, and Canadian borders.
 - Plotted findings using ggplot.
 
 ## [Lab04 - Tesselations, Spatial Joins, and Point-in-Polygon](https://hopewilcox.github.io/lab-04.html)
-![](lab04_pic.png)
+![](lab04_pic.png){width=20%}
+
 - Looked at impacts of tessellated surfaces using national dam data.
 - Mapped US counties using Voronoi, triangulation, hexagonal, and gridded tessellations.
 - Created functions to expedite mapping tasks.
 
 ## [Lab05 - Raster Analysis](https://hopewilcox.github.io/lab05.html)
-![](lab05_pic.png)
+![](lab05_pic.png){width=20%}
+
 - Used raster data from Landsat to analyze the impacts of a flood in Palo, Iowa. 
 - Using the raster package, categorized flood images using the multiband imagery.
 
 ## [Lab06 - Terrain Analysis](https://hopewilcox.github.io/lab-06.html)
-![](lab06_pic.png)
+![](lab06_pic.png){width=20%}
+
 - Analyzed a flood event in Santa Barbara, California.
 - Mapped the boundary of the river basin, the river, and the buildings (including railways) inside the basin.
 _ Created a GIF showing the buildings affected by the flood at different stages.
