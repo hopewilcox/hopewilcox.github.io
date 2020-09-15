@@ -12,6 +12,8 @@ title: "About Me"
 
 I am a recent graduate of the University of California, Santa Barbara with a degree in physical geography. Through my undergraduate studies, I have developed an interest in environmental and physical sciences, specifically in water resources and drought. I have written papers on water resources and the impact of drought on vegetation in the southern California region. 
 
+During the summer of 2020, I took an introductory Geographic Information Systems class and did a variety of projects. The topics ranged from wrangling raw COVID-19 data from the New York Times, to analyzing a flood in Iowa using raster data from Landsat.
+
 As a full time student and part-time worker, time management and organization has been key during my time at UCSB. Outside of my pursuit of a degree, I found a passion in volunteering at my local Humane Society. Working with the animals and ensuring they have quality human interaction while they wait for adoption has kept me grounded and seen the importance of community service.
 
-Based in Santa Barbara county, I plan on searching for employment in the area to put my knowledge to good use and further my education in a professional setting. For any professional inquiries, contact me at hopewilcox22@gmail.com. 
+Based in Santa Barbara county, I plan on searching for employment in the area to put my knowledge to good use and further my education in a professional setting. For any professional inquiries, contact me at hopewilcox22@gmail.com. To view my GIS projects, take a look at [my GitHub page](https://github.com/hopewilcox/hopewilcox.github.io).

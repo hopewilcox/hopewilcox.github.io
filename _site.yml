@@ -8,10 +8,15 @@ navbar:
       icon: fa-home
       href: index.html
     - text: "GIS Work"
-      icon: fa-book
+      icon: fa-globe
       href: geog176A.html
     - text: "CV"
       href: cv.html
+      icon: fa-pencil-square-o
+  right:
+    - icon: fa-user-o
+      href: https://github.com/hopewilcox/hopewilcox.github.io
+      
 output:
   html_document:
     theme: flatly 
