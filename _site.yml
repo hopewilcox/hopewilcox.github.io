@@ -13,6 +13,9 @@ navbar:
     - text: "CV"
       href: cv.html
       icon: fa-pencil-square-o
+    - text: "Remote Sensing Work"
+      icon: fa-globe
+      href: rs.html
   right:
     - icon: fa-user-o
       href: https://github.com/hopewilcox
